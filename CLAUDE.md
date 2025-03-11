@@ -7,6 +7,10 @@
 - **Format code**: `black .`
 - **Check types**: `mypy src/ app.py`
 - **Lint code**: `flake8 src/ app.py`
+- **Run tests**: `pytest tests/`
+- **Run specific test**: `pytest tests/test_data.py::TestData::test_fetch_fred_data`
+- **Run tests with coverage**: `pytest --cov=src tests/`
+- **Run slow tests**: `pytest --run-slow tests/`
 
 ## Code Style Guidelines
 - **Imports**: Standard libraries first, third-party packages second, local modules last
@@ -17,5 +21,9 @@
 - **Line length**: Maximum 88 characters (Black default)
 - **Module organization**: Keep related functionality in dedicated modules
 - **Formatting**: Run Black before committing changes
+- **Testing**: Write unit tests for new functionality, mark slow tests with @pytest.mark.slow
 
-The codebase is structured as a Streamlit application that fetches FRED data, generates time-series forecasts with SARIMAX models, and visualizes forecast distributions.
+## Project Overview
+The fred-forecaster is a Streamlit application that fetches Federal Reserve Economic Data (FRED), 
+generates time-series forecasts using both classical (SARIMAX) and Bayesian models, 
+and visualizes forecast distributions with optional calibration to CBO targets.

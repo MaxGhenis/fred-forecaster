@@ -1,0 +1,60 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fred_forecaster"
+version = "0.1.0"
+description = "Time series forecasting for FRED economic data"
+readme = "README.md"
+authors = [
+    {name = "Max Ghenis", email = "max@example.com"}
+]
+license = {text = "MIT"}
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "numpy>=1.25.0",
+    "pandas>=2.0.0",
+    "fredapi>=0.5.0",
+    "scipy>=1.9.0,<1.12.0",  # Pin scipy to avoid compatibility issues
+    "statsmodels>=0.14.0",
+    "matplotlib>=3.7.0",
+    "plotly>=5.14.0",
+    "pymc>=5.0.0",
+    "arviz>=0.16.0",
+    "aesara>=2.9.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "black",
+    "isort",
+    "flake8",
+    "mypy",
+]
+app = [
+    "streamlit",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/maxghenis/fred-forecaster"
+"Bug Tracker" = "https://github.com/maxghenis/fred-forecaster/issues"
+
+[tool.black]
+line-length = 88
+
+[tool.isort]
+profile = "black"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+]

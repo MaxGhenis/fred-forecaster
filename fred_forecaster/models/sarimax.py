@@ -1,16 +1,29 @@
+"""SARIMAX time series forecasting models."""
+
 import numpy as np
 import pandas as pd
 from statsmodels.tsa.statespace.sarimax import SARIMAX
-import pymc as pm
-import arviz as az
-import aesara.tensor as at
+from typing import Tuple, Union
 
 
-def fit_sarimax_model(ts_data: pd.Series):
+def fit_sarimax_model(ts_data: Union[pd.Series, pd.DataFrame]):
     """
-    Fits a SARIMAX model to the provided time series data (quarterly Debt).
-    Returns a fitted SARIMAXResults object.
+    Fits a SARIMAX model to the provided time series data.
+    
+    Parameters
+    ----------
+    ts_data : Union[pd.Series, pd.DataFrame]
+        Time series data to fit. If DataFrame, the first column is used.
+        
+    Returns
+    -------
+    SARIMAXResults
+        Fitted SARIMAX model
     """
+    # Convert DataFrame to Series if needed
+    if isinstance(ts_data, pd.DataFrame):
+        ts_data = ts_data.iloc[:, 0]
+        
     p, d, q = 1, 1, 1
     P, D, Q, m = 0, 1, 0, 4  # Example
     model = SARIMAX(
@@ -24,10 +37,23 @@ def fit_sarimax_model(ts_data: pd.Series):
     return results
 
 
-def generate_simulations(results, df_quarterly: pd.DataFrame, end="2028Q4", N=1000):
+def generate_simulations(
+    results, df_quarterly: pd.DataFrame, end: str = "2028Q4", N: int = 1000
+) -> Tuple[np.ndarray, pd.PeriodIndex]:
     """
     Generate N random simulations from the fitted SARIMAX results,
     forecasting until the given 'end' Period (e.g., 2028Q4).
+
+    Parameters
+    ----------
+    results : SARIMAXResults
+        Fitted SARIMAX model results
+    df_quarterly : pd.DataFrame
+        Historical data with PeriodIndex
+    end : str
+        End period for forecast in format 'YYYYQN' (e.g., '2028Q4')
+    N : int
+        Number of simulations to generate
 
     Returns
     -------
@@ -38,7 +64,12 @@ def generate_simulations(results, df_quarterly: pd.DataFrame, end="2028Q4", N=10
     """
     # Forecast range
     last_period = df_quarterly.index[-1]
-    start_forecast = last_period + 1
+    # Create the next period after last_period correctly
+    start_forecast = pd.Period(f"{last_period.year}Q{last_period.quarter}", freq="Q-DEC")
+    if last_period.quarter < 4:
+        start_forecast = pd.Period(f"{last_period.year}Q{last_period.quarter + 1}", freq="Q-DEC")
+    else:
+        start_forecast = pd.Period(f"{last_period.year + 1}Q1", freq="Q-DEC")
     end_forecast = pd.Period(end, freq="Q-DEC")
 
     def quarter_index(prd: pd.Period) -> int:
